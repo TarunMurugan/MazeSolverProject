@@ -1,0 +1,8 @@
+MazeBot KEYWORD1
+MazeBot KEYWORD2
+forward KEYWORD2
+turn_left KEYWORD2
+turn_right KEYWORD2
+wall_left KEYWORD2
+wall_right KEYWORD2
+wall_front KEYWORD2

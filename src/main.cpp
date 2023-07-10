@@ -4,8 +4,15 @@
 #include <deque>
 #include <iostream>
 #include <algorithm>
-// #include "API.h"
+#include "MazeBot.h"
 #include <string>
+
+int left_mot[2]={16,17},right_mot[2]={13,19},ultrasonic_echo[4]={27,18,14,33},ultrasonic_trig=5;
+HCSR04 ultrasonic(ultrasonic_trig,ultrasonic_echo,4);
+MPU6050 mpu;
+
+MazeBot mazebot(left_mot,right_mot,ultrasonic_echo,ultrasonic_trig);
+
 
 enum DIRECTIONS {
     EAST = 1, SOUTH = 2, WEST = 3, NORTH = 4
@@ -15,7 +22,12 @@ typedef struct Point {
     int x;
     int y;
 
-    bool operator==(const Point &rhs) const = default;
+    bool operator==(const Point &rhs) const {
+        if(x==rhs.x && y==rhs.y){
+        return true;
+        }
+        return false;
+    }
 
     // bool operator<=>(const Point &rhs) const {
     //     if (x < rhs.x)
@@ -58,43 +70,43 @@ public:
     virtual void ack_reset() = 0;
 };
 
-// class CustomMouse : public Mouse {
-//     int maze_width() override {
-//         return API::mazeWidth();
-//     }
+class CustomMouse : public Mouse {
+    int maze_width() override {
+        return 16;
+    }
 
-//     int maze_height() override {
-//         return API::mazeHeight();
-//     }
+    int maze_height() override {
+        return 16;
+    }
 
-//     bool wall_front() override {
-//         return API::wallFront();
-//     }
+    bool wall_front() override {
+        return mazebot.wall_front();
+    }
 
-//     bool wall_right() override {
-//         return API::wallRight();
-//     }
+    bool wall_right() override {
+        return mazebot.wall_right();
+    }
 
-//     bool wall_left() override {
-//         return API::wallLeft();
-//     }
+    bool wall_left() override {
+        return mazebot.wall_left();
+    }
 
-//     void move_forward() override {
-//         API::moveForward(1);
-//     }
+    void move_forward() override {
+        mazebot.forward();
+    }
 
-//     void turn_right() override {
-//         API::turnRight();
-//     }
+    void turn_right() override {
+        mazebot.turn_right();
+    }
 
-//     void turn_left() override {
-//         API::turnLeft();
-//     }
+    void turn_left() override {
+        mazebot.turn_left();
+    }
 
-//     void ack_reset() override {
-//         API::ackReset();
-//     }
-// };
+    void ack_reset() override {
+        ;
+    }
+};
 
 class [[maybe_unused]] FloodFill {
 public:
@@ -173,17 +185,17 @@ public:
 
     void updateWalls() {
         log("wall list size:"+std::to_string(walls.size()));
-        bool left = mouse->wall_left();
-        bool right = mouse->wall_right();
-        bool front = mouse->wall_front();
+        bool left_wall = mouse->wall_left();
+        bool right_wall = mouse->wall_right();
+        bool front_wall = mouse->wall_front();
         std::set<DIRECTIONS> wallSet{};
-        if (left) {
+        if (left_wall) {
             wallSet.insert(DIRECTIONS((orient > 1) ? orient - 1 : 4));
         }
-        if (front) {
+        if (front_wall) {
             wallSet.insert(orient);
         }
-        if (right) {
+        if (right_wall) {
             wallSet.insert(DIRECTIONS((orient < 4) ? orient + 1 : 1));
         }
         if (!walls.contains(current)) {
@@ -226,7 +238,7 @@ public:
     void floodfillAll(PointType cell) {
         queue.push_back(cell);
         log("called floodfill");
-        for(const auto& [key, value] : walls){
+        for(const auto &[key, value] : walls){
         log("("+std::to_string(key.x)+","+std::to_string(key.y)+"):",0);
         for(int i=0; i<value.size();i++){
             log("("+std::to_string(value[i].x)+","+std::to_string(value[i].y)+") ",0);
@@ -241,20 +253,20 @@ public:
                 log("("+std::to_string(queue[i].x)+","+std::to_string(queue[i].y)+"),",0);
             }
             log(" ");
-            PointType back{queue.back()};
+            PointType popped_cell{queue.back()};
             queue.pop_back();
-            if (!walls.contains(back)) {
-                walls[back] = {};
+            if (!walls.contains(popped_cell)) {
+                walls[popped_cell] = {};
             }
-            std::vector<PointType> wallPoints{walls[back]}; 
+            std::vector<PointType> wallPoints{walls[popped_cell]}; 
             // for(i=0 ;i<wallPoints.size();i++) {
-            //     log("floodfill:wallpoints:"+std::to_string(back.x)+","+std::to_string(back.y)+" pts:"+std::to_string(wallPoints[i].x)+","+std::to_string(wallPoints[i].y));
+            //     log("floodfill:wallpoints:"+std::to_string(popped_cell.x)+","+std::to_string(popped_cell.y)+" pts:"+std::to_string(wallPoints[i].x)+","+std::to_string(wallPoints[i].y));
                 
 
             // }
-            std::vector<PointType> neighbourPoints{neighbours(back)};
+            std::vector<PointType> neighbourPoints{neighbours(popped_cell)};
             for (auto const &wall: wallPoints) {
-                // log("floodfill:back:"+std::to_string(back.x)+","+std::to_string(back.y)+" erasing:"+std::to_string(wall.x)+","+std::to_string(wall.y));
+                // log("floodfill:popped_cell:"+std::to_string(popped_cell.x)+","+std::to_string(popped_cell.y)+" erasing:"+std::to_string(wall.x)+","+std::to_string(wall.y));
                 std::erase(neighbourPoints, wall);
             }
             std::vector<int> nValues{};
@@ -273,8 +285,8 @@ public:
             log("");
             log("------");
             int min{*std::ranges::min_element(nValues)};
-            if (flood[back.x][back.y] <= min) {
-                flood[back.x][back.y] = min + 1;
+            if (flood[popped_cell.x][popped_cell.y] <= min) {
+                flood[popped_cell.x][popped_cell.y] = min + 1;
                 for (auto const &neighbour: neighbourPoints) {
                     queue.push_back(neighbour);
                 }
@@ -478,10 +490,28 @@ public:
     }
 };
 
-int main() {
-    Mouse mouse{};
-    FloodFill floodfill{&mouse};
+void setup() {
+    analogWrite(0,0);
+    pinMode(27,OUTPUT);
+    pinMode(26,OUTPUT);
+    pinMode(32,OUTPUT);
+  Serial.begin(115200);
+  Serial.println("setup_arnav");
+  mazebot.begin();
+  Serial.println("setup");
+  mazebot.proportionality_const=10;
+  pinMode(39,INPUT);
+  pinMode(36,INPUT);
+  digitalWrite(27,1);
+  digitalWrite(26,1);
+  delay(1000);
+
+}
+
+void loop() {
+    CustomMouse cantbemouse{};
+    FloodFill floodfill{&cantbemouse};
     floodfill.run();
     floodfill.reset(false);
-    return 0;
+    delay(10000);
 }

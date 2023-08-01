@@ -7,7 +7,7 @@
 #include "MazeBot.h"
 #include <string>
 
-int left_mot[2]={16,17},right_mot[2]={13,19},ultrasonic_echo[4]={27,18,14,33},ultrasonic_trig=5;
+int left_mot[2]={16,17},right_mot[2]={13,19},ultrasonic_echo[4]={27,18,14,33},ultrasonic_trig[2]={5,32};
 HCSR04 ultrasonic(ultrasonic_trig,ultrasonic_echo,4);
 MPU6050 mpu;
 
@@ -69,6 +69,7 @@ public:
 
     virtual void ack_reset() = 0;
 };
+double dummy=1000;
 
 class CustomMouse : public Mouse {
     int maze_width() override {
@@ -84,11 +85,11 @@ class CustomMouse : public Mouse {
     }
 
     bool wall_right() override {
-        return mazebot.wall_right();
+        return mazebot.wall_right(dummy);
     }
 
     bool wall_left() override {
-        return mazebot.wall_left();
+        return mazebot.wall_left(dummy);
     }
 
     void move_forward() override {

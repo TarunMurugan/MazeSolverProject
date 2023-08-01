@@ -11,24 +11,29 @@
 class MazeBot
 {
   public:
-    MazeBot(int left_mot[2],int right_mot[2],int ultrasonic_echo[4],int ultrasonic_trig);
+    MazeBot(int left_mot[2],int right_mot[2],int ultrasonic_echo[4],int ultrasonic_trig[2]);
     void begin();   
     void forward();
     void turn_right();
     void turn_left();
-    bool wall_left();
-    bool wall_right();
+    bool wall_left(double x);
+    bool wall_right(double x);
     bool wall_front();
+    void printvals();
+    void Led1(bool x);
+    void Led2(bool y);
+    bool Switch1();
+    bool Switch2();
     #define front 0
     #define right 1
     #define behind 2
     #define left 3
-    int speed=200,proportionality_const=20,sidewall_dist=5;
+    float speed=90,proportionality_const=4,sidewall_dist=5,integral_offset=0,derivative_offset=0;
     float imu_weight=0.5;
 
 
   private:
-    int *_left, *_right, _ultrasonic_trig, *_ultrasonic_echo,i,j;
+    int *_left, *_right, *_ultrasonic_trig, *_ultrasonic_echo,i,j;
     void get_yaw();
     uint8_t devStatus;
     uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)

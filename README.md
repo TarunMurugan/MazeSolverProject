@@ -88,9 +88,9 @@ The `lib/` folder contains a custom-built `MazeBot` library that integrates:
 - **Wall detection logic**
 
 ## Example Robot Setup
-An image of the bot:
-![image of bot in maze](images/mazeBot.jpg)
-- credits: [Team Robomanipal](https://robomanipal.com/)
+An image of our bot:<br />
+![image of bot in maze](images/mazeBot.jpg)<br />
+credits: [Team Robomanipal](https://robomanipal.com/)
 
 
 ## Contributing

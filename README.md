@@ -90,7 +90,7 @@ The `lib/` folder contains a custom-built `MazeBot` library that integrates:
 ## Example Robot Setup
 An image of the physical bot can be added here:
 ```
-images/bot_setup.jpg
+![image of bot in maze}(images/mazeBot.jpg)
 ```
 
 ## Contributing

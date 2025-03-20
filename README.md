@@ -89,8 +89,11 @@ The `lib/` folder contains a custom-built `MazeBot` library that integrates:
 
 ## Example Robot Setup
 An image of our bot:<br />
-![image of bot in maze](images/mazeBot.jpg)<br />
-credits: [Team Robomanipal](https://robomanipal.com/)
+<div align="center">
+  <img src="images/mazeBot.jpg" alt="image of bot in maze" />
+</div>
+
+**Credits:** [Team Robomanipal](https://robomanipal.com/)
 
 
 ## Contributing

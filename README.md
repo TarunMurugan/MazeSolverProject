@@ -96,16 +96,4 @@ An image of our bot:<br />
 **Credits:** [Team Robomanipal](https://robomanipal.com/)
 
 
-## Contributing
-Contributions are welcome! If you'd like to contribute:
-- Fork the repository.
-- Create a feature branch.
-- Commit your changes.
-- Submit a pull request for review.
-
-## License
-This project is licensed under the **MIT License**. See the `LICENSE` file for details.
-
-## Acknowledgments
-Special thanks to contributors and the open-source community for providing valuable resources and tools that make this project possible.
 
